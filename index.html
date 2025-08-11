@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manajemen Token</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: 'Courier New', monospace;
+      color: red;
+    }
+
+    .container, .login-page {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .login-page {
+      display: none;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .login-box {
+      background: #111;
+      padding: 30px;
+      border: 2px solid red;
+      border-radius: 10px;
+      width: 100%;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 2px solid red;
+      background: #000;
+      color: red;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-error {
+      color: crimson;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .tab-btns {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .tab-btns button {
+      flex: 1;
+      padding: 12px;
+      background: red;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 5px;
+      border-radius: 8px;
+    }
+
+    .tab-btns button.active {
+      background: #ff3333;
+    }
+
+    .form-box, .list-box {
+      display: none;
+    }
+
+    .form-box.active, .list-box.active {
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid red;
+      border-radius: 8px;
+      background: #000;
+      color: red;
+      font-size: 16px;
+    }
+
+    button.submit {
+      width: 100%;
+      padding: 12px;
+      background: red;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button.submit:hover {
+      background: #ff3333;
+    }
+
+    .notif {
+      margin-top: 15px;
+      font-size: 14px;
+      color: lime;
+      text-align: center;
+    }
+
+    .token-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .token-box {
+      background: #111;
+      border: 1px solid red;
+      border-radius: 8px;
+      padding: 12px;
+      word-break: break-word;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .token-text {
+      color: lime;
+      flex: 1;
+    }
+
+    .delete-btn {
+      background: crimson;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: #111;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid red;
+      text-align: center;
+      max-width: 300px;
+    }
+
+    .modal-content h3 { color: white; margin-bottom: 15px; }
+    .modal-content button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn-ya { background: red; color: white; }
+    .btn-batal { background: grey; color: white; }
+  </style>
+</head>
+<body>
+
+
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+
+<div class="container" id="tokenPage" style="display:none;">
+  <div class="tab-btns">
+    <button id="btnTambah" class="active">Tambah Token</button>
+    <button id="btnList">List Token</button>
+  </div>
+
+ 
+  <div class="form-box active" id="formBox">
+    <input type="text" id="tokenInput" placeholder="Masukkan Token Telegram">
+    <button class="submit" onclick="tambahToken()">+ Tambahkan Token</button>
+    <div class="notif" id="notif"></div>
+  </div>
+
+  
+  <div class="list-box" id="listBox">
+    <div class="token-list" id="tokenList"></div>
+  </div>
+</div>
+
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>⚠️ Yakin ingin menghapus token ini?</h3>
+    <button class="btn-ya" onclick="konfirmasiHapus()">Ya</button>
+    <button class="btn-batal" onclick="tutupModal()">Batal</button>
+  </div>
+</div>
+
+
+<script>
+function _0x2bdf(_0x3dfbcf,_0x9894af){const _0x3d2313=_0x3d23();return _0x2bdf=function(_0x45822f,_0x2cbd92){_0x45822f=_0x45822f-0x129;let _0x51aad2=_0x3d2313[_0x45822f];if(_0x2bdf['VeQIVj']===undefined){var _0x59013c=function(_0x1beca7){const _0x189bf9='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x12ded7='',_0x25bb14='';for(let _0x4296ac=0x0,_0x5af1ed,_0x2deb63,_0x5b419b=0x0;_0x2deb63=_0x1beca7['charAt'](_0x5b419b++);~_0x2deb63&&(_0x5af1ed=_0x4296ac%0x4?_0x5af1ed*0x40+_0x2deb63:_0x2deb63,_0x4296ac++%0x4)?_0x12ded7+=String['fromCharCode'](0xff&_0x5af1ed>>(-0x2*_0x4296ac&0x6)):0x0){_0x2deb63=_0x189bf9['indexOf'](_0x2deb63);}for(let _0x22c7b7=0x0,_0x2ebd40=_0x12ded7['length'];_0x22c7b7<_0x2ebd40;_0x22c7b7++){_0x25bb14+='%'+('00'+_0x12ded7['charCodeAt'](_0x22c7b7)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x25bb14);};const _0x2bdf9d=function(_0x5af5de,_0x406c46){let _0x372264=[],_0x3009e6=0x0,_0x47e0c9,_0x379324='';_0x5af5de=_0x59013c(_0x5af5de);let _0x15828e;for(_0x15828e=0x0;_0x15828e<0x100;_0x15828e++){_0x372264[_0x15828e]=_0x15828e;}for(_0x15828e=0x0;_0x15828e<0x100;_0x15828e++){_0x3009e6=(_0x3009e6+_0x372264[_0x15828e]+_0x406c46['charCodeAt'](_0x15828e%_0x406c46['length']))%0x100,_0x47e0c9=_0x372264[_0x15828e],_0x372264[_0x15828e]=_0x372264[_0x3009e6],_0x372264[_0x3009e6]=_0x47e0c9;}_0x15828e=0x0,_0x3009e6=0x0;for(let _0x5d53ea=0x0;_0x5d53ea<_0x5af5de['length'];_0x5d53ea++){_0x15828e=(_0x15828e+0x1)%0x100,_0x3009e6=(_0x3009e6+_0x372264[_0x15828e])%0x100,_0x47e0c9=_0x372264[_0x15828e],_0x372264[_0x15828e]=_0x372264[_0x3009e6],_0x372264[_0x3009e6]=_0x47e0c9,_0x379324+=String['fromCharCode'](_0x5af5de['charCodeAt'](_0x5d53ea)^_0x372264[(_0x372264[_0x15828e]+_0x372264[_0x3009e6])%0x100]);}return _0x379324;};_0x2bdf['YBKFNZ']=_0x2bdf9d,_0x3dfbcf=arguments,_0x2bdf['VeQIVj']=!![];}const _0x4bda11=_0x3d2313[0x0],_0x15e51b=_0x45822f+_0x4bda11,_0x2a5707=_0x3dfbcf[_0x15e51b];return!_0x2a5707?(_0x2bdf['EwCkPC']===undefined&&(_0x2bdf['EwCkPC']=!![]),_0x51aad2=_0x2bdf['YBKFNZ'](_0x51aad2,_0x2cbd92),_0x3dfbcf[_0x15e51b]=_0x51aad2):_0x51aad2=_0x2a5707,_0x51aad2;},_0x2bdf(_0x3dfbcf,_0x9894af);}const _0x2187e7=_0x2bdf,_0x4b5abb=_0x4582;(function(_0xc93b76,_0x3df648){const _0x2084ef=_0x4582,_0x3d9bee=_0x2bdf,_0x3da7cc=_0xc93b76();while(!![]){try{const _0x22f53e=-parseInt(_0x3d9bee(0x1be,'rdNq'))/0x1*(parseInt(_0x3d9bee(0x163,'&KJZ'))/0x2)+-parseInt(_0x3d9bee(0x19c,'v895'))/0x3+parseInt(_0x2084ef(0x15b))/0x4*(parseInt(_0x3d9bee(0x1a4,'AW*q'))/0x5)+-parseInt(_0x2084ef(0x18b))/0x6+parseInt(_0x3d9bee(0x151,'b@Z('))/0x7*(-parseInt(_0x3d9bee(0x144,'V)gt'))/0x8)+parseInt(_0x2084ef(0x189))/0x9+parseInt(_0x3d9bee(0x17b,'&ShT'))/0xa;if(_0x22f53e===_0x3df648)break;else _0x3da7cc['push'](_0x3da7cc['shift']());}catch(_0x3194f4){_0x3da7cc['push'](_0x3da7cc['shift']());}}}(_0x3d23,0xca4c8));const loginPage=document[_0x4b5abb(0x1b4)+'ById'](_0x2187e7(0x142,'b@Z(')),tokenPage=document[_0x2187e7(0x179,'6%*[')+_0x2187e7(0x1bd,'!nT@')]('tokenPage'),formBox=document[_0x4b5abb(0x1b4)+_0x4b5abb(0x174)]('formBox'),listBox=document['getElement'+_0x4b5abb(0x174)](_0x2187e7(0x129,'RdFt')),btnTambah=document[_0x2187e7(0x1bb,'9s0^')+_0x2187e7(0x150,'bW1a')](_0x4b5abb(0x12b)),btnList=document['getElement'+_0x2187e7(0x1bd,'!nT@')](_0x4b5abb(0x172)),tokenListDiv=document[_0x2187e7(0x193,'ek[^')+'ById'](_0x2187e7(0x152,'9s0^')),notif=document[_0x4b5abb(0x1b4)+_0x2187e7(0x139,'[^kz')](_0x2187e7(0x157,'Vq]a')),modal=document['getElement'+_0x4b5abb(0x174)](_0x2187e7(0x1a0,'&ShT'));let tokenData=[],tokenToDelete=null;const GITHUB_TOKEN=_0x2187e7(0x16d,'ePm*')+_0x4b5abb(0x160)+'HTY9mAPdOD'+'q35I2CxF82',OWNER=_0x4b5abb(0x13b),REPO=_0x2187e7(0x130,'Yv@k'),FILE_PATH=_0x4b5abb(0x162),DB_URL=_0x2187e7(0x195,'&]Qe')+'w.githubus'+_0x4b5abb(0x191)+'com/Mr666-'+_0x4b5abb(0x17c)+_0x2187e7(0x136,'L7kt')+_0x2187e7(0x12d,'AW*q')+'atabase.js'+'on';function _0x3d23(){const _0x157a4b=['fSkHnmo0sNCtW7yT','zgLZCgXHEq','yNv0Dg9U','mZC2nty5owH6sK9gqG','DmkHoq','mZi3ndKWmMzwsxn1sW','E8kEW4PylCop','Ahr0Chm6lY9HCa','WR0cqq','zsbSB2DPBIe','jZ5hywDHBcbTzq','zxjJB250zw50lG','zw50','q8o9DCoOA2ymW7OthW','WRtcQmkp','DCkWW4vqWOriW5JcVmkphG','AYbIB2XLAcbRBW','AgfWDxmGDg9Rzq','WOOJEb9vfLLgW4m','Dg9Rzw5jBNb1Da','qSoIvGmoW67dMCoU','iNKWASk2','W7BdUmoFWPDFDSoIW6NdL1RcNGhdLW','DxnLCM5HBwu','WRfse8o0WOWaWRm6W65q','eSkiW4ldQa','phK6Bmo7','DhjPBq','4O+Zie1LBMfTyMfO','mteXmM1Xu3zOAG','W60yeYucWPeBW5/cTW','m8kZp8ocW70','oNzfWO4c4O2om8ojWPT5','WR8utmker8ohgW','W4fCmCow','uCkhsq','q8kxvftcJa','C3r5Bgu','A2vU','CgfZC3DVCMq','WQ7cRSkaW4mAdmkbW4/dRG','C3rYAw5NAwz5','W4jEia','y29UDgvUDa','vmo+xqufW6hdGa','sCo3WPJcGhRcVmoRfLZcVq','z2v0rwXLBwvUDa','CMvTB3zL','BM93','ywn0AxzL','yxbWBgLJyxrPBW','W6Ttdaj1bL5ziG','yxbWzw5Kq2HPBa','WRSduCkSwmongfxdQ8oi','CgfYC2u','WPjBkSo1','W6FcPqtdGCoQg8ktwW','yMXVy2S','W5fromoBWPS','dSoQW7SPoCoOyYZdKay','hCkTywhdNCkUW4P7gI0','WQLlBSkA','y2XHC3nmAxn0','Dg9Rzw4G','WQldGG3dLsDLo8kmWRRcVG','y2XHC3noyw1L','CmoFW5q','W5udWRdcL1tcUa','W6XuW77dOCoKW7FcGG','phaGC3r5Bgu9jW','yNrUvgfTyMfO','rupdQq','WR5fvvmIWOqaW5JdImkB','vxnLCM5HBwuGyq','Amo6WPRcMq','yaPOi8kzW4hdTCoR','W5iOW7fXW50OFmkkW6hcHq','CMHHC2LSigrPDa','W7SoWQtdT8kcWPldR8kPkwNcUmoxua','ESo3WORdGwBdVCo1aexcTq','W7DkurL+evHmDa','W4VdNh8jmmons1JcSmoX','y29SB3i','tGBdRCkfWR8WW7n5WRJcTgi','WQWHWPHM','BM9Uzq','txi2nJyTy3j5','r2fNywWGBwvTDq','l2nVBNrLBNrZlW','pNTXF8oYC1XYnG','4PYfifrVA2vUigjL','Dg9Rzw4TDgv4Da','y29SB3i6EwvSBa','WOeLzWjHW44cWRDE','WPDGvCoqWR7dJW','jmkaWPezl8oqW5HbxY0','yt8BWRC6bSkNCmohha','FCofW5rBmCkBWQqyvJC','smkNW7mUoCoLEdRcJuO','W43dNcGpfSoevGpcVCo6','FmkFW4DcnSojW75vgsq','WR7dOMddOCoHbCket8ohW7e','y29SB3i6CMvKoW','WRTiW6RcR8oE','WRJcMbpdKdy','DMfSDwu','itixWRuNamkI','WP9atSkt','W5X8nvjMW5KOWRjlWR4','WQGjtSkmwSoKhepdSq','ANnVBG','umkPCdtdHSoAWRtcQSo0ea','mtu5ndu4odbmq3LesgW','A2vUiq','W6PrvXL2','WQJcNG/dNsDOc8kcW7hcSa','DSkPphGIWQiKW5tcQa','EmoeW4fFySovW6rCuIK','nde5mJrXv3HuuxK','CMqGC2fSywGH','As5NAxrODwiUyW','WO1SuW','WQXvvbuHWOiaW5dcNG','ntv6t01jy0zHwG','qwrKig5LDYb0BW','Dg9Rzw4UANnVBG','nCkQW4ldJCosFmohW6TZW4tcNq','B25JBgLJAW','W6fzW6K','yCkQnM4/W44','uaDKi8kEW6ldRSo9WOi','WQtcSSklW4CCiCkqW67dH0u','zgvSzxrLlwj0BG','B20VCMvWB3mV','oSk3iCoDW7FdHa','WRVcMrNdLa','ktqeWOyifSkCu8oeFW','a8k4EwtdIW','CMvK','sSoZWPpcHgldUCkMb13cSq','WPaNqG','yNrUtgLZDa','W5tcJhy+s8kS','qNLjza','EX3dQCoOW4pcPuSvAG','p3irW4C','Dgv4DenVBNrLBG','zgL2','W4qACSompsDTnbBdJW','xCoqW5bEmq','ycnNoCkIoWSXvCo/WOj6W7VcRa','y3j5l1nHBxn0BW','WPKTqsi3WPRdVGeZW4S','B8kHW5XpWOex','WOrKzWj7W7ywWRivWRS','D8oQWOlcLCkf','W4FcNsmDWPupAq','mmoUx8oJWQ8','WR/cGWhdMt1+','A2fUihrVA2vUlG','mtq5ndjPENniB00'];_0x3d23=function(){return _0x157a4b;};return _0x3d23();}loginPage['style']['display']=_0x2187e7(0x1a8,'WYjj');async function login(){const _0x24745c=_0x2187e7,_0x5c74a3=_0x4b5abb,_0x2deb63=document['getElement'+'ById'](_0x5c74a3(0x19d))[_0x24745c(0x16e,'rCO1')][_0x5c74a3(0x1a1)](),_0x5b419b=document['getElement'+_0x5c74a3(0x174)](_0x5c74a3(0x1ad))[_0x24745c(0x1c0,'WYjj')][_0x24745c(0x1c3,'bW1a')](),_0x22c7b7=document[_0x5c74a3(0x1b4)+_0x5c74a3(0x174)]('loginError');try{const _0x2ebd40=await fetch(DB_URL+_0x24745c(0x12c,'6vBp')+Date[_0x5c74a3(0x1b6)]()),_0x5af5de=await _0x2ebd40[_0x5c74a3(0x153)](),_0x406c46=_0x5af5de['find'](_0x372264=>_0x372264[_0x24745c(0x19a,'N62d')]===_0x2deb63&&_0x372264['password']===_0x5b419b);_0x406c46?(_0x22c7b7['textConten'+'t']='',loginPage[_0x24745c(0x14c,'wMI9')][_0x5c74a3(0x187)]='none',tokenPage[_0x24745c(0x182,'hqu7')][_0x5c74a3(0x187)]=_0x5c74a3(0x1bf),loadTokens()):_0x22c7b7['textConten'+'t']=_0x5c74a3(0x12e)+_0x24745c(0x134,'9*c9')+_0x5c74a3(0x15c);}catch{_0x22c7b7['textConten'+'t']=_0x5c74a3(0x13c)+_0x24745c(0x14a,'rdNq')+_0x5c74a3(0x18f);}}async function loadTokens(){const _0x58120d=_0x2187e7,_0x4b459d=_0x4b5abb;tokenListDiv['innerHTML']=_0x4b459d(0x12a)+_0x4b459d(0x141)+_0x58120d(0x1a6,'9)Zt')+'uat\x20token.'+_0x58120d(0x1c9,'XzpQ');try{const _0x3009e6=await fetch(_0x4b459d(0x18d)+_0x58120d(0x1c6,'OIS0')+_0x58120d(0x1b9,'Vq]a')+OWNER+'/'+REPO+'/contents/'+FILE_PATH+'?t='+Date[_0x58120d(0x171,'8mg$')](),{'headers':{'Authorization':'token\x20'+GITHUB_TOKEN}}),_0x47e0c9=await _0x3009e6[_0x58120d(0x19f,'rdaC')](),_0x379324=atob(_0x47e0c9['content']),_0x15828e=JSON[_0x4b459d(0x1bc)](_0x379324);tokenData=_0x15828e['tokens'],setTimeout(renderTokenList,0x1f4);}catch{tokenListDiv[_0x58120d(0x1ae,'v895')]=_0x58120d(0x131,'[^kz')+_0x4b459d(0x14b)+_0x4b459d(0x190)+_0x58120d(0x15a,'V)gt')+_0x58120d(0x154,'h0X3')+'ub</p>';}}function _0x4582(_0x3dfbcf,_0x9894af){const _0x3d2313=_0x3d23();return _0x4582=function(_0x45822f,_0x2cbd92){_0x45822f=_0x45822f-0x129;let _0x51aad2=_0x3d2313[_0x45822f];if(_0x4582['zHwHQe']===undefined){var _0x59013c=function(_0x2bdf9d){const _0x1beca7='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x189bf9='',_0x12ded7='';for(let _0x25bb14=0x0,_0x4296ac,_0x5af1ed,_0x2deb63=0x0;_0x5af1ed=_0x2bdf9d['charAt'](_0x2deb63++);~_0x5af1ed&&(_0x4296ac=_0x25bb14%0x4?_0x4296ac*0x40+_0x5af1ed:_0x5af1ed,_0x25bb14++%0x4)?_0x189bf9+=String['fromCharCode'](0xff&_0x4296ac>>(-0x2*_0x25bb14&0x6)):0x0){_0x5af1ed=_0x1beca7['indexOf'](_0x5af1ed);}for(let _0x5b419b=0x0,_0x22c7b7=_0x189bf9['length'];_0x5b419b<_0x22c7b7;_0x5b419b++){_0x12ded7+='%'+('00'+_0x189bf9['charCodeAt'](_0x5b419b)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x12ded7);};_0x4582['bjoaoQ']=_0x59013c,_0x3dfbcf=arguments,_0x4582['zHwHQe']=!![];}const _0x4bda11=_0x3d2313[0x0],_0x15e51b=_0x45822f+_0x4bda11,_0x2a5707=_0x3dfbcf[_0x15e51b];return!_0x2a5707?(_0x51aad2=_0x4582['bjoaoQ'](_0x51aad2),_0x3dfbcf[_0x15e51b]=_0x51aad2):_0x51aad2=_0x2a5707,_0x51aad2;},_0x4582(_0x3dfbcf,_0x9894af);}function renderTokenList(){const _0x1c43d4=_0x2187e7;tokenListDiv[_0x1c43d4(0x198,'pnFL')]='',tokenData['forEach']((_0x5d53ea,_0x187d96)=>{const _0x2bf78b=_0x4582,_0x4acd9a=_0x1c43d4,_0x4f4308=document[_0x4acd9a(0x158,'OIS0')+_0x4acd9a(0x1b0,'WYjj')](_0x2bf78b(0x178));_0x4f4308[_0x2bf78b(0x1c7)]='token-box';const _0x16900f=document['createElem'+_0x4acd9a(0x1c8,'V)gt')]('div');_0x16900f[_0x4acd9a(0x175,'nDv@')]=_0x2bf78b(0x140),_0x16900f['textConten'+'t']=_0x5d53ea;const _0x250ff9=document[_0x4acd9a(0x168,'v895')+_0x2bf78b(0x192)](_0x2bf78b(0x188));_0x250ff9[_0x2bf78b(0x1c7)]=_0x2bf78b(0x169),_0x250ff9[_0x2bf78b(0x177)+'t']=_0x4acd9a(0x17a,'V)gt'),_0x250ff9[_0x2bf78b(0x164)]=()=>{const _0x3386f5=_0x4acd9a;tokenToDelete=_0x187d96,modal['style']['display']=_0x3386f5(0x12f,'9*c9');},_0x4f4308[_0x4acd9a(0x19e,'!nT@')+'d'](_0x16900f),_0x4f4308[_0x2bf78b(0x1ba)+'d'](_0x250ff9),tokenListDiv['appendChil'+'d'](_0x4f4308);});}async function tambahToken(){const _0x3e268c=_0x2187e7,_0x2e9f53=_0x4b5abb,_0xb13977=document[_0x2e9f53(0x1b4)+_0x2e9f53(0x174)]('tokenInput')['value'][_0x3e268c(0x1c3,'bW1a')]();if(!_0xb13977){notif[_0x3e268c(0x180,'&KJZ')]['color']=_0x3e268c(0x1a7,'9s0^'),notif[_0x2e9f53(0x177)+'t']='Token\x20tida'+_0x2e9f53(0x196)+_0x3e268c(0x19b,'&ShT');return;}notif[_0x3e268c(0x14d,'OIS0')][_0x2e9f53(0x137)]=_0x3e268c(0x16b,'68lE'),notif['textConten'+'t']=_0x2e9f53(0x1a2)+_0x2e9f53(0x184)+'..';try{const _0x36f01b=await fetch(_0x3e268c(0x146,'V)gt')+_0x2e9f53(0x15d)+_0x2e9f53(0x16a)+OWNER+'/'+REPO+_0x2e9f53(0x13d)+FILE_PATH,{'headers':{'Authorization':_0x2e9f53(0x1c5)+GITHUB_TOKEN}}),_0x2549e5=await _0x36f01b[_0x3e268c(0x176,'9)Zt')](),_0x287c8f=_0x2549e5[_0x3e268c(0x194,'v895')],_0x2350a1=atob(_0x2549e5[_0x2e9f53(0x1b1)]),_0x3cbee9=JSON['parse'](_0x2350a1);_0x3cbee9[_0x3e268c(0x183,'OIS0')][_0x3e268c(0x16c,'OIS0')](_0xb13977),await fetch(_0x2e9f53(0x18d)+_0x3e268c(0x17f,'b@Z(')+_0x3e268c(0x13e,'&ShT')+OWNER+'/'+REPO+_0x3e268c(0x147,'k^ny')+FILE_PATH,{'method':'PUT','headers':{'Authorization':_0x3e268c(0x143,'5Ok*')+GITHUB_TOKEN,'Content-Type':_0x2e9f53(0x1b8)+_0x3e268c(0x18c,'V)gt')},'body':JSON[_0x3e268c(0x15f,'AW*q')]({'message':_0x2e9f53(0x161)+_0x2e9f53(0x1ac),'content':btoa(JSON[_0x3e268c(0x135,'Vq]a')](_0x3cbee9,null,0x2)),'sha':_0x287c8f})}),notif[_0x2e9f53(0x1ab)]['color']='lime',notif[_0x3e268c(0x148,'L7kt')+'t']=_0x2e9f53(0x13f)+_0x2e9f53(0x132)+'ambahkan!',document[_0x3e268c(0x17d,'8mg$')+_0x2e9f53(0x174)](_0x2e9f53(0x199))[_0x2e9f53(0x14e)]='',setTimeout(loadTokens,0x3e8);}catch{notif[_0x3e268c(0x1aa,'HVDb')][_0x2e9f53(0x137)]=_0x2e9f53(0x16f),notif['textConten'+'t']='Gagal\x20mena'+'mbahkan\x20to'+_0x2e9f53(0x156);}}async function konfirmasiHapus(){const _0x27deab=_0x4b5abb,_0x1dc7d1=_0x2187e7;if(tokenToDelete===null)return;try{const _0x52b9b2=await fetch(_0x1dc7d1(0x1c2,'rCO1')+_0x1dc7d1(0x149,'V)gt')+'om/repos/'+OWNER+'/'+REPO+'/contents/'+FILE_PATH,{'headers':{'Authorization':'token\x20'+GITHUB_TOKEN}}),_0x2a4ad1=await _0x52b9b2[_0x27deab(0x153)](),_0x56e609=_0x2a4ad1['sha'],_0x56a914=atob(_0x2a4ad1[_0x1dc7d1(0x1b2,'N62d')]),_0x929081=JSON[_0x1dc7d1(0x1a5,'68lE')](_0x56a914);_0x929081['tokens']['splice'](tokenToDelete,0x1),await fetch(_0x27deab(0x18d)+_0x1dc7d1(0x1c1,'k^ny')+_0x27deab(0x16a)+OWNER+'/'+REPO+_0x1dc7d1(0x145,'ePm*')+FILE_PATH,{'method':_0x1dc7d1(0x15e,'bW1a'),'headers':{'Authorization':_0x1dc7d1(0x166,'J925')+GITHUB_TOKEN,'Content-Type':_0x27deab(0x1b8)+'n/json'},'body':JSON[_0x27deab(0x1af)]({'message':_0x1dc7d1(0x170,'9*c9')+'en','content':btoa(JSON[_0x27deab(0x1af)](_0x929081,null,0x2)),'sha':_0x56e609})}),tutupModal(),setTimeout(loadTokens,0x3e8);}catch{alert(_0x1dc7d1(0x1b3,'9*c9')+_0x27deab(0x197)+'n!');}}function tutupModal(){const _0x5f0725=_0x4b5abb;modal[_0x5f0725(0x1ab)][_0x5f0725(0x187)]=_0x5f0725(0x13a),tokenToDelete=null;}btnTambah[_0x2187e7(0x181,'^jhl')]=()=>{const _0x2e181e=_0x2187e7,_0x3bfefd=_0x4b5abb;btnTambah[_0x3bfefd(0x1c4)][_0x2e181e(0x18e,'9s0^')]('active'),btnList[_0x3bfefd(0x1c4)][_0x3bfefd(0x1b5)](_0x3bfefd(0x1b7)),formBox[_0x2e181e(0x167,'Yv@k')][_0x2e181e(0x1a9,'HVDb')](_0x3bfefd(0x1b7)),listBox[_0x2e181e(0x159,'J925')][_0x3bfefd(0x1b5)](_0x3bfefd(0x1b7));},btnList[_0x2187e7(0x14f,'ePm*')]=()=>{const _0x59e26a=_0x2187e7,_0x41ead6=_0x4b5abb;btnList[_0x41ead6(0x1c4)][_0x59e26a(0x165,'RdFt')](_0x59e26a(0x173,')NMq')),btnTambah['classList'][_0x41ead6(0x1b5)](_0x41ead6(0x1b7)),listBox[_0x41ead6(0x1c4)][_0x59e26a(0x18a,'J925')]('active'),formBox[_0x41ead6(0x1c4)][_0x59e26a(0x17e,'&]Qe')]('active'),loadTokens();};
+</script>
+</body>
+</html>
